@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getPlayerSeasonBadges, getAllSeasonBadges, awardSeasonBadge, getSeasonTiers, setSeasonTiers, getPlayerProgress, updatePlayerProgress } from "@/lib/seasonStore";
 import { rateLimit, getIP, rateLimitResponse } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api/withErrorHandling";
 import { withValidation } from "@/lib/api/withValidation";
+import { assertAdminAuth } from "@/lib/api/adminAuth";
+import { verifyCallerAuth } from "@/lib/walletAuth";
 import { seasonBadgeBodySchema, seasonTiersBodySchema, playerProgressBodySchema } from "@hunty/types/api-schemas";
 
 /**
@@ -42,6 +44,8 @@ export const GET = withErrorHandling(async (req: Request) => {
 export const POST = withValidation(
   { body: seasonBadgeBodySchema },
   async (req, _context, { body }) => {
+    await assertAdminAuth(req);
+
     const ip = getIP(req);
     const { success, reset } = await rateLimit(ip, { limit: 10, windowMs: 60 * 1000 });
     if (!success) return rateLimitResponse(reset);
@@ -59,6 +63,8 @@ export const POST = withValidation(
 export const PUT = withValidation(
   { body: seasonTiersBodySchema },
   async (req, _context, { body }) => {
+    await assertAdminAuth(req);
+
     const ip = getIP(req);
     const { success, reset } = await rateLimit(ip, { limit: 10, windowMs: 60 * 1000 });
     if (!success) return rateLimitResponse(reset);
@@ -76,11 +82,22 @@ export const PUT = withValidation(
 export const PATCH = withValidation(
   { body: playerProgressBodySchema },
   async (req, _context, { body }) => {
+    const caller = await verifyCallerAuth(req as NextRequest, body);
+    if (!caller.authenticated || !caller.authorized) {
+      return NextResponse.json({ error: caller.error }, { status: caller.status || 401 });
+    }
+    
+    // Derive the actor from the verified identity, not the body.
+    const actorAddress = caller.actor;
+    if (!actorAddress) {
+      return NextResponse.json({ error: "No actor could be derived from credentials." }, { status: 401 });
+    }
+
     const ip = getIP(req);
     const { success, reset } = await rateLimit(ip, { limit: 100, windowMs: 60 * 1000 });
     if (!success) return rateLimitResponse(reset);
 
-    const progress = updatePlayerProgress(body.seasonId, body.address, body.progressDelta);
+    const progress = updatePlayerProgress(body.seasonId, actorAddress, body.progressDelta);
     return NextResponse.json({ progress });
   }
 );
