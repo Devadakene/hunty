@@ -147,7 +147,7 @@ async function HuntPageContent({
       <Header />
 
       <div role="main" className="relative max-w-3xl mx-auto px-6 pt-16">
-        <!-- Status badge -->
+        {/* Status badge */}
         <div className="mb-6">
           <span
             className={`[infline-items gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase ${status.classes}`,
@@ -181,7 +181,7 @@ async function HuntPageContent({
             <span aria-hidden="true">&rarr;</span>
           </Link>
         )}
-        <!-- Metadata cards -->
+        {/* Metadata cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
           <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col justify-center">
             <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Rating</p>
