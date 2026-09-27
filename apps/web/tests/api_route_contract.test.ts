@@ -240,7 +240,10 @@ const ROUTE_MANIFEST: RouteEntry[] = [
   { file: "v1/hunts/[id]/reviews/[reviewId]/moderate/route.ts", path: "/api/v1/hunts/[id]/reviews/[reviewId]/moderate", methods: ["POST"], auth: "public" },
 
   // ── v1 / seasons ─────────────────────────────────────────────────────
-  { file: "v1/seasons/route.ts",                    path: "/api/v1/seasons",                    methods: ["GET", "POST"],   auth: "public" },
+  // GET is public; POST requires a signed wallet challenge from an address in
+  // ADMIN_WALLET_ADDRESSES or the ADMIN_API_SECRET bearer token — see
+  // app/api/v1/seasons/route.ts and its __tests__ for the credential checks.
+  { file: "v1/seasons/route.ts",                    path: "/api/v1/seasons",                    methods: ["GET", "POST"],   auth: "admin" },
   { file: "v1/seasons/[id]/route.ts",               path: "/api/v1/seasons/[id]",               methods: ["GET", "POST", "PATCH"], auth: "public" },
   { file: "v1/seasons/archived/route.ts",           path: "/api/v1/seasons/archived",           methods: ["GET"],           auth: "public" },
   { file: "v1/seasons/badges/route.ts",             path: "/api/v1/seasons/badges",             methods: ["GET", "POST"],   auth: "public" },
