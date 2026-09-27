@@ -104,6 +104,19 @@ export const PLAYER_COUNT = {
   CACHE_TTL_MS: 60_000,
 } as const
 
+// ─── Player Profile Stats ────────────────────────────────────────────────────
+
+export const PLAYER_PROFILE_STATS = {
+  /** How long a derived profile summary is considered fresh (ms). */
+  CACHE_TTL_MS: 60_000,
+  /**
+   * Hard cap on cached profile summaries. The cache is keyed by player address
+   * and hunt set, so without a cap an attacker enumerating addresses would grow
+   * it without bound. Least-recently-used entries are evicted first.
+   */
+  CACHE_MAX_ENTRIES: 200,
+} as const
+
 // ─── API Rate Limiting ──────────────────────────────────────────────────────
 
 export const RATE_LIMITS = {
