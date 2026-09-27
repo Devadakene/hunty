@@ -30,7 +30,7 @@ export const POST = withErrorHandling(async (req: Request) => {
     });
   }
 
-  let body: { hunt?: StoredHint; challenge?: string; signature?: string };
+  let body: { hunt?: StoredHunt; challenge?: string; signature?: string };
   try {
     body = await req.json();
   } catch {
